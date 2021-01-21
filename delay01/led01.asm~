@@ -1,0 +1,50 @@
+org 0
+sjmp Start
+  org 30H
+  
+Start:
+  MOV A,#0H
+  MOV B,#0FFH
+  MOV P1, #0FFH
+SLOOP:
+  
+  PUSH A
+  CPL A
+  MOV p1,A
+  POP A
+  MOV R0,#02D
+  CALL Delay_ms
+  INC A
+  CJNE A,B,SLOOP
+  JMP Start
+  
+  
+
+Delay_ms:
+  MOV R6,#0F6H
+
+Outer_loop:
+  ACALL LOOP
+  DJNZ R0, Outer_loop
+  RET
+  
+LOOP: 
+  ACALL DELAY
+  DJNZ R6,LOOP
+  RET
+
+DELAY: 
+  MOV TMOD,#00000001B 
+  MOV TH0,#0FCH
+  MOV TL0,#018H 
+  SETB TR0 
+  
+LOOP_END:
+  JNB TF0,LOOP_END 
+  CLR TR0 
+  CLR TF0 
+  RET
+  
+end
+
+
