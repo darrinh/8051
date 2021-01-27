@@ -272,7 +272,7 @@
 		pwin_orient="horizontal">
 
 		<file name="led01.asm" active="no" o_bookmark="0" p_bookmark="0" file_index="0" read_only="0" highlight="0">
-			<actual_line value="12"/>
+			<actual_line value="15"/>
 			<md5_hash value="C9698D5D97FD8DD655F90F2168EE2F90"/>
 			<path><![CDATA[]]></path>
 			<bookmarks>
@@ -301,9 +301,24 @@
 			<notes><![CDATA[]]></notes>
 		</file>
 
-		<file name="led03.asm" active="yes" o_bookmark="0" p_bookmark="0" file_index="0" read_only="0" highlight="0">
-			<actual_line value="45"/>
+		<file name="led03.asm" active="no" o_bookmark="0" p_bookmark="0" file_index="0" read_only="0" highlight="0">
+			<actual_line value="10"/>
 			<md5_hash value="931FE75831F8DFEB8E5512FA86F7661D"/>
+			<path><![CDATA[]]></path>
+			<bookmarks>
+				0
+			</bookmarks>
+			<breakpoints>
+				0
+			</breakpoints>
+			<eol value="lf"/>
+			<encoding value="utf-8"/>
+			<notes><![CDATA[]]></notes>
+		</file>
+
+		<file name="seven_segment.asm" active="yes" o_bookmark="0" p_bookmark="0" file_index="0" read_only="0" highlight="0">
+			<actual_line value="20"/>
+			<md5_hash value="7ED73F1A3A80458F130183523912D57B"/>
 			<path><![CDATA[]]></path>
 			<bookmarks>
 				0

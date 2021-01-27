@@ -1,32 +1,70 @@
 org 0
-sjmp Start
-  org 30H
- 
-;digit 0 - C0H  
-;digit 1 - F9H
-;digit 2 - A4H 
-;digit 3 - B0H
-;digit 4 - 99H
-;digit 5 - 12H
-;digit 6 - 82H
-;digit 7 - 58h 
-;digit 8 - 80H
-Start:
 
-  mov p0,#080H
-  clr p2.0    ;turns on left most 7 segment display (3)
- ; clr p2.1    ;(2)
-  ;clr p2.2    ;(3)
-  ;clr p2.3    ;(1)
+jmp init
 
-  clr p0.0
-  
-  jmp start
-  
-  
+NUMBERS:db 0C0h
+        db 0F9H
+        db 0A4H
+        db 0B0H
+        db 099H
+        db 012H
+        db 082H
+        db 058H
+        db 080H
+
+DIGITS data 20h
+
+INIT: 
+ 	
+	mov DPTR,#numbers
+	
+	mov DIGITS+00H,#1H
+	mov DIGITS+01H,#2H
+	mov DIGITS+02H,#3H
+	mov DIGITS+03H,#4H
+	mov P2,#0ffH ;turn off all segments
+	mov P0,#0H
+RESET:
+	mov B,#3H
+	mov R1,#08H
+	jmp main
+	
+main:
+       
+
+        mov R0,#DIGITS
+        mov A,R0
+        add a,b
+        dec b
+        mov R0,A
+        mov A,@R0
+        movc A,@A+DPTR
+        
+        mov P0,A
+        mov a,R1
+        cpl a
+        mov p2,A
+        mov p2,#0ffh
+        mov a,r1
+        rr a
+        mov r1,a
+        cjne R1,#80h,main
+        jmp reset
+        
+
+
+        
+        
+       
+       
+        
+
+
+	
+	jmp main
 
 Delay_ms:
-  MOV R6,#0F6H
+  MOV R6,#5FH
 
 Outer_loop:
   ACALL LOOP
@@ -50,7 +88,5 @@ LOOP_END:
   CLR TF0 
   RET
   
-end
 
-
-
+	end 
