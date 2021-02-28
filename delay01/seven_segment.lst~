@@ -3,96 +3,91 @@ seven_segment                                                                   
                          2
 0000 02000C              3     jmp init
                          4
-0003 C0                  5     NUMBERS:db 0C0h
-0004 F9                  6             db 0F9H
-0005 A4                  7             db 0A4H
-0006 B0                  8             db 0B0H
-0007 99                  9             db 099H
-0008 12                 10             db 012H
-0009 82                 11             db 082H
-000A 58                 12             db 058H
-000B 80                 13             db 080H
-                        14
-  0020                  15     DIGITS data 20h
-                        16
-                        17     INIT:
-                        18
-000C 900003             19             mov DPTR,#numbers
+                         5     ;table container digit patterns
+0003 C0                  6     NUMBER_TABLE:db 0C0h
+0004 F9                  7                  db 0F9H
+0005 A4                  8                  db 0A4H
+0006 B0                  9                  db 0B0H
+0007 99                 10                  db 099H
+0008 12                 11                  db 012H
+0009 82                 12                  db 082H
+000A 58                 13                  db 058H
+000B 80                 14                  db 080H
+                        15     ;the decimal digits, 4 places, 0-9
+  0020                  16     DIGIT_CTR data 20h
+                        17     ;point to each digit in DIGIT_CTR
+  0024                  18     DIGIT_PTR data 24h
+                        19
                         20
-000F 752001             21             mov DIGITS+00H,#1H
-0012 752102             22             mov DIGITS+01H,#2H
-0015 752203             23             mov DIGITS+02H,#3H
-0018 752304             24             mov DIGITS+03H,#4H
-001B 75A0FF             25             mov P2,#0ffH ;turn off all segments
-001E 758000             26             mov P0,#0H
-                        27     RESET:
-0021 75F003             28             mov B,#3H
-0024 7908               29             mov R1,#08H
-0026 020029             30             jmp main
-                        31
-                        32     main:
-                        33
-                        34
-0029 7820               35             mov R0,#DIGITS
-002B E8                 36             mov A,R0
-002C 25F0               37             add a,b
-002E 15F0               38             dec b
-0030 F8                 39             mov R0,A
-0031 E6                 40             mov A,@R0
-0032 93                 41             movc A,@A+DPTR
-0033 7580FF             42             mov P0,#0FFh
-                        43
-0036 F580               44             mov P0,A
-                        45
-0038 E9                 46             mov a,R1
-0039 F4                 47             cpl a
-003A F5A0               48             mov p2,A
-003C E9                 49             mov a,r1
-003D 03                 50            rr a
-003E F9                 51            mov r1,a
-                        52
-003F B980E7             53             cjne R1,#80h,main
-0042 80DD               54             jmp reset
-                        55
-                        56
+                        21
+                        22     INIT:
+000C 752400             23             mov DIGIT_PTR,#0h
+000F 900003             24             mov DPTR,#NUMBER_TABLE
+                        25             ;set all digits to zero
+0012 752000             26             mov DIGIT_CTR+00H,#0H
+0015 752100             27             mov DIGIT_CTR+01H,#0H
+0018 752200             28             mov DIGIT_CTR+02H,#0H
+001B 752300             29             mov DIGIT_CTR+03H,#0H
+001E 75A0FF             30             mov P2,#0ffH ;turn off all segments
+0021 758000             31             mov P0,#0H
+                        32     RESET:
+0024 75F003             33             mov B,#3H
+0027 7908               34             mov R1,#08H
+0029 02002C             35             jmp main
+                        36
+                        37
+                        38     main:
+002C 7820               39             mov R0,#DIGIT_CTR
+002E E8                 40             mov A,R0
+002F 25F0               41             add a,b
+0031 15F0               42             dec b
+0033 F8                 43             mov R0,A
+0034 E6                 44             mov A,@R0
+0035 93                 45             movc A,@A+DPTR
+0036 F580               46             mov P0,A
+0038 E9                 47             mov a,R1
+0039 F4                 48             cpl a
+003A F5A0               49             mov p2,A
+003C 75A0FF             50             mov p2,#0ffh
+003F E9                 51             mov a,r1
+0040 03                 52             rr a
+0041 F9                 53             mov r1,a
+0042 12004A             54             call counter_increment
+0045 B980E4             55             cjne R1,#80h,main
+0048 80DA               56             jmp reset
                         57
                         58
-                        59
-                        60
+                        59     counter_increment:
+004A 7844               60             mov R0,#DIGIT_PTR+DIGIT_CTR
                         61
                         62
-                        63
+004C 22                 63             ret
                         64
                         65
-0044 80E3               66             jmp main
+                        66
                         67
-                        68     Delay_ms:
-0046 7E5F               69       MOV R6,#5FH
+                        68
+                        69
                         70
-                        71     Outer_loop:
-0048 114D               72       ACALL LOOP
-004A D8FC               73       DJNZ R0, Outer_loop
-004C 22                 74       RET
+004D 04                 71             inc a
+004E F6                 72             mov @r0,a
+                        73
+                        74
                         75
-                        76     LOOP:
-004D 1152               77       ACALL DELAY
-004F DEFC               78       DJNZ R6,LOOP
-0051 22                 79       RET
+                        76
+                        77
+                        78
+                        79
                         80
-                        81     DELAY:
-0052 758901             82       MOV TMOD,#00000001B
-0055 758CFC             83       MOV TH0,#0FCH
-0058 758A18             84       MOV TL0,#018H
-005B D28C               85       SETB TR0
+                        81
+                        82
+                        83
+                        84
+                        85
                         86
-                        87     LOOP_END:
-005D 308DFD             88       JNB TF0,LOOP_END
-0060 C28C               89       CLR TR0
-0062 C28D               90       CLR TF0
-0064 22                 91       RET
-                        92
-                        93
-                        94             end
+                        87
+                        88
+                        89             end
 ASSEMBLY COMPLETE, NO ERRORS FOUND, NO WARNINGS
 
 
@@ -146,13 +141,13 @@ CKSEL. . . . . . . . . . . . . . . .  D  ADDR  0085H  NOT USED
 CL . . . . . . . . . . . . . . . . .  D  ADDR  00E9H  NOT USED
 CLKREG . . . . . . . . . . . . . . .  D  ADDR  008FH  NOT USED
 CMOD . . . . . . . . . . . . . . . .  D  ADDR  00D9H  NOT USED
+COUNTER_INCREMENT. . . . . . . . . .  C  ADDR  004AH
 CPRL2. . . . . . . . . . . . . . . .  B  ADDR  00C8H  NOT USED
 CR . . . . . . . . . . . . . . . . .  B  ADDR  00DEH  NOT USED
 CT2. . . . . . . . . . . . . . . . .  B  ADDR  00C9H  NOT USED
 CY . . . . . . . . . . . . . . . . .  B  ADDR  00D7H  NOT USED
-DELAY. . . . . . . . . . . . . . . .  C  ADDR  0052H
-DELAY_MS . . . . . . . . . . . . . .  C  ADDR  0046H  NOT USED
-DIGITS . . . . . . . . . . . . . . .  D  ADDR  0020H
+DIGIT_CTR. . . . . . . . . . . . . .  D  ADDR  0020H
+DIGIT_PTR. . . . . . . . . . . . . .  D  ADDR  0024H
 DP0H . . . . . . . . . . . . . . . .  D  ADDR  0083H  NOT USED
 DP0L . . . . . . . . . . . . . . . .  D  ADDR  0082H  NOT USED
 DP1H . . . . . . . . . . . . . . . .  D  ADDR  0085H  NOT USED
@@ -191,12 +186,9 @@ IT1. . . . . . . . . . . . . . . . .  B  ADDR  008AH  NOT USED
 KBE. . . . . . . . . . . . . . . . .  D  ADDR  009DH  NOT USED
 KBF. . . . . . . . . . . . . . . . .  D  ADDR  009EH  NOT USED
 KBLS . . . . . . . . . . . . . . . .  D  ADDR  009CH  NOT USED
-LOOP . . . . . . . . . . . . . . . .  C  ADDR  004DH
-LOOP_END . . . . . . . . . . . . . .  C  ADDR  005DH
-MAIN . . . . . . . . . . . . . . . .  C  ADDR  0029H
-NUMBERS. . . . . . . . . . . . . . .  C  ADDR  0003H
+MAIN . . . . . . . . . . . . . . . .  C  ADDR  002CH
+NUMBER_TABLE . . . . . . . . . . . .  C  ADDR  0003H
 OSCCON . . . . . . . . . . . . . . .  D  ADDR  0086H  NOT USED
-OUTER_LOOP . . . . . . . . . . . . .  C  ADDR  0048H
 OV . . . . . . . . . . . . . . . . .  B  ADDR  00D2H  NOT USED
 P. . . . . . . . . . . . . . . . . .  B  ADDR  00D0H  NOT USED
 P0 . . . . . . . . . . . . . . . . .  D  ADDR  0080H
@@ -234,7 +226,7 @@ RCLK . . . . . . . . . . . . . . . .  B  ADDR  00CDH  NOT USED
 RD . . . . . . . . . . . . . . . . .  B  ADDR  00B7H  NOT USED
 REN. . . . . . . . . . . . . . . . .  B  ADDR  009CH  NOT USED
 RESET. . . . . . . . . . . . . . . .  C  ADDR  0000H
-RESET. . . . . . . . . . . . . . . .  C  ADDR  0021H  NOT USED
+RESET. . . . . . . . . . . . . . . .  C  ADDR  0024H  NOT USED
 RI . . . . . . . . . . . . . . . . .  B  ADDR  0098H  NOT USED
 RS0. . . . . . . . . . . . . . . . .  B  ADDR  00D3H  NOT USED
 RS1. . . . . . . . . . . . . . . . .  B  ADDR  00D4H  NOT USED
@@ -265,21 +257,21 @@ T2MOD. . . . . . . . . . . . . . . .  D  ADDR  00C9H  NOT USED
 TB8. . . . . . . . . . . . . . . . .  B  ADDR  009BH  NOT USED
 TCLK . . . . . . . . . . . . . . . .  B  ADDR  00CCH  NOT USED
 TCON . . . . . . . . . . . . . . . .  D  ADDR  0088H  NOT USED
-TF0. . . . . . . . . . . . . . . . .  B  ADDR  008DH
+TF0. . . . . . . . . . . . . . . . .  B  ADDR  008DH  NOT USED
 TF1. . . . . . . . . . . . . . . . .  B  ADDR  008FH  NOT USED
 TF2. . . . . . . . . . . . . . . . .  B  ADDR  00CFH  NOT USED
-TH0. . . . . . . . . . . . . . . . .  D  ADDR  008CH
+TH0. . . . . . . . . . . . . . . . .  D  ADDR  008CH  NOT USED
 TH1. . . . . . . . . . . . . . . . .  D  ADDR  008DH  NOT USED
 TH2. . . . . . . . . . . . . . . . .  D  ADDR  00CDH  NOT USED
 TI . . . . . . . . . . . . . . . . .  B  ADDR  0099H  NOT USED
 TIMER0 . . . . . . . . . . . . . . .  C  ADDR  000BH  NOT USED
 TIMER1 . . . . . . . . . . . . . . .  C  ADDR  001BH  NOT USED
 TIMER2 . . . . . . . . . . . . . . .  C  ADDR  002BH  NOT USED
-TL0. . . . . . . . . . . . . . . . .  D  ADDR  008AH
+TL0. . . . . . . . . . . . . . . . .  D  ADDR  008AH  NOT USED
 TL1. . . . . . . . . . . . . . . . .  D  ADDR  008BH  NOT USED
 TL2. . . . . . . . . . . . . . . . .  D  ADDR  00CCH  NOT USED
-TMOD . . . . . . . . . . . . . . . .  D  ADDR  0089H
-TR0. . . . . . . . . . . . . . . . .  B  ADDR  008CH
+TMOD . . . . . . . . . . . . . . . .  D  ADDR  0089H  NOT USED
+TR0. . . . . . . . . . . . . . . . .  B  ADDR  008CH  NOT USED
 TR1. . . . . . . . . . . . . . . . .  B  ADDR  008EH  NOT USED
 TR2. . . . . . . . . . . . . . . . .  B  ADDR  00CAH  NOT USED
 TXD. . . . . . . . . . . . . . . . .  B  ADDR  00B1H  NOT USED
